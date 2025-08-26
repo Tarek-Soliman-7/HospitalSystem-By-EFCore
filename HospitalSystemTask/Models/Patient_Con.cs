@@ -9,10 +9,11 @@ namespace HospitalSystemTask.Models
 {
     internal class Patient_Con
     {
- 
-        public int Con_Id {  get; set; }
-       
         public int Pat_Id {  get; set; }
+        public Patient Patient { get; set; } = null!;
 
+
+         public int Con_Id {  get; set; }
+        public Consultant Consultant { get; set; } = null!;
     }
 }

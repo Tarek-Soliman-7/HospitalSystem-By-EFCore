@@ -12,5 +12,10 @@ namespace HospitalSystemTask.Models
         public int Id { get; set; }
         [MaxLength(50)]
         public string Name { get; set; }
+
+        public ICollection<Patient> Patients { get; set; } = new HashSet<Patient>();
+
+        public ICollection<Patient_Con>? Patient_Cons { get; set; } = new HashSet<Patient_Con>();
+
     }
 }

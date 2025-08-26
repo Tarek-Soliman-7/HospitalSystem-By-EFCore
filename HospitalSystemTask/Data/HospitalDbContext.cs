@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,16 +18,7 @@ namespace HospitalSystemTask.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Patient_Con>()
-                .HasKey(pc => new { pc.Con_Id, pc.Pat_Id });
-
-            modelBuilder.Entity<Drug_Brand>()
-                .HasKey(db => new { db.Code, db.Brand });
-
-            modelBuilder.Entity<Nurse_Drug_Patient>()
-                .HasKey(ndp => new { ndp.Pat_Id, ndp.Date, ndp.Time });
-
-            base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
         public DbSet<Patient> Patients { get; set; }
         public DbSet<Ward> Wards { get; set; }

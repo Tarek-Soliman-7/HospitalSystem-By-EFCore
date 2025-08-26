@@ -4,6 +4,7 @@ using HospitalSystemTask.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HospitalSystemTask.Migrations
 {
     [DbContext(typeof(HospitalDbContext))]
-    partial class HospitalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250825145247_o-oWardNurse")]
+    partial class ooWardNurse
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -88,12 +91,10 @@ namespace HospitalSystemTask.Migrations
                         .HasMaxLength(25)
                         .HasColumnType("nvarchar(25)");
 
-                    b.Property<int>("Ward_Id")
+                    b.Property<int>("Word_Id")
                         .HasColumnType("int");
 
                     b.HasKey("Number");
-
-                    b.HasIndex("Ward_Id");
 
                     b.ToTable("Nurses");
                 });
@@ -121,10 +122,6 @@ namespace HospitalSystemTask.Migrations
 
                     b.HasKey("Pat_Id", "Date", "Time");
 
-                    b.HasIndex("Drug_Code");
-
-                    b.HasIndex("Nur_Num");
-
                     b.ToTable("nurse_Drug_Patients");
                 });
 
@@ -136,25 +133,36 @@ namespace HospitalSystemTask.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("AssignedId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Con_Id")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("DOB")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("HostsId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(25)
                         .HasColumnType("nvarchar(25)");
+
+                    b.Property<int?>("PatientId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Ward_Id")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Con_Id");
+                    b.HasIndex("AssignedId");
 
-                    b.HasIndex("Ward_Id");
+                    b.HasIndex("HostsId");
+
+                    b.HasIndex("PatientId");
 
                     b.ToTable("Patients");
                 });
@@ -168,8 +176,6 @@ namespace HospitalSystemTask.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Con_Id", "Pat_Id");
-
-                    b.HasIndex("Pat_Id");
 
                     b.ToTable("Patient_Cons");
                 });
@@ -198,91 +204,27 @@ namespace HospitalSystemTask.Migrations
                     b.ToTable("Wards");
                 });
 
-            modelBuilder.Entity("HospitalSystemTask.Models.Drug_Brand", b =>
-                {
-                    b.HasOne("HospitalSystemTask.Models.Drug", "Drug")
-                        .WithMany("Brands")
-                        .HasForeignKey("Code")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Drug");
-                });
-
-            modelBuilder.Entity("HospitalSystemTask.Models.Nurse", b =>
-                {
-                    b.HasOne("HospitalSystemTask.Models.Ward", "Ward")
-                        .WithMany("Nurses")
-                        .HasForeignKey("Ward_Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Ward");
-                });
-
-            modelBuilder.Entity("HospitalSystemTask.Models.Nurse_Drug_Patient", b =>
-                {
-                    b.HasOne("HospitalSystemTask.Models.Drug", "Drug")
-                        .WithMany("Nurse_Drug_Patients")
-                        .HasForeignKey("Drug_Code")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("HospitalSystemTask.Models.Nurse", "Nurse")
-                        .WithMany("Nurse_Drug_Patients")
-                        .HasForeignKey("Nur_Num")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("HospitalSystemTask.Models.Patient", "Patient")
-                        .WithMany("Nurse_Drug_Patients")
-                        .HasForeignKey("Pat_Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Drug");
-
-                    b.Navigation("Nurse");
-
-                    b.Navigation("Patient");
-                });
-
             modelBuilder.Entity("HospitalSystemTask.Models.Patient", b =>
                 {
-                    b.HasOne("HospitalSystemTask.Models.Consultant", "Consultant")
+                    b.HasOne("HospitalSystemTask.Models.Consultant", "Assigned")
+                        .WithMany()
+                        .HasForeignKey("AssignedId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HospitalSystemTask.Models.Ward", "Hosts")
+                        .WithMany()
+                        .HasForeignKey("HostsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HospitalSystemTask.Models.Patient", null)
                         .WithMany("Patients")
-                        .HasForeignKey("Con_Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("PatientId");
 
-                    b.HasOne("HospitalSystemTask.Models.Ward", "Ward")
-                        .WithMany("Patients")
-                        .HasForeignKey("Ward_Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.Navigation("Assigned");
 
-                    b.Navigation("Consultant");
-
-                    b.Navigation("Ward");
-                });
-
-            modelBuilder.Entity("HospitalSystemTask.Models.Patient_Con", b =>
-                {
-                    b.HasOne("HospitalSystemTask.Models.Consultant", "Consultant")
-                        .WithMany("Patient_Cons")
-                        .HasForeignKey("Con_Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("HospitalSystemTask.Models.Patient", "Patient")
-                        .WithMany("Patient_Cons")
-                        .HasForeignKey("Pat_Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Consultant");
-
-                    b.Navigation("Patient");
+                    b.Navigation("Hosts");
                 });
 
             modelBuilder.Entity("HospitalSystemTask.Models.Ward", b =>
@@ -296,38 +238,13 @@ namespace HospitalSystemTask.Migrations
                     b.Navigation("Supervisor");
                 });
 
-            modelBuilder.Entity("HospitalSystemTask.Models.Consultant", b =>
-                {
-                    b.Navigation("Patient_Cons");
-
-                    b.Navigation("Patients");
-                });
-
-            modelBuilder.Entity("HospitalSystemTask.Models.Drug", b =>
-                {
-                    b.Navigation("Brands");
-
-                    b.Navigation("Nurse_Drug_Patients");
-                });
-
             modelBuilder.Entity("HospitalSystemTask.Models.Nurse", b =>
                 {
-                    b.Navigation("Nurse_Drug_Patients");
-
                     b.Navigation("SupervisedWard");
                 });
 
             modelBuilder.Entity("HospitalSystemTask.Models.Patient", b =>
                 {
-                    b.Navigation("Nurse_Drug_Patients");
-
-                    b.Navigation("Patient_Cons");
-                });
-
-            modelBuilder.Entity("HospitalSystemTask.Models.Ward", b =>
-                {
-                    b.Navigation("Nurses");
-
                     b.Navigation("Patients");
                 });
 #pragma warning restore 612, 618
